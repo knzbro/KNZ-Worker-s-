@@ -116,8 +116,18 @@ fun HomeScreen(viewModel: KnzViewModel) {
                 ) {
                     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                         Icon(Icons.Default.TrendingUp, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.align(Alignment.TopEnd))
+                        
+                        var progressDays by remember { mutableStateOf(0) }
+                        LaunchedEffect(Unit) {
+                            if (viewModel.prefs.isChallengeRunning && viewModel.prefs.challengeStartTimeMs > 0) {
+                                val diffMs = System.currentTimeMillis() - viewModel.prefs.challengeStartTimeMs
+                                val daysPassed = (diffMs / (1000 * 60 * 60 * 24)).toInt()
+                                progressDays = (daysPassed + 1).coerceAtMost(30)
+                            }
+                        }
+                        
                         Text(
-                            text = "View\nMetrics",
+                            text = if (viewModel.prefs.isChallengeRunning) "Day $progressDays/30\nChallenge" else "Challenge\nPaused",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onTertiary,

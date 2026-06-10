@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 fun SettingsScreen(viewModel: KnzViewModel) {
     val context = LocalContext.current
     val themeIndex by viewModel.themeIndex.collectAsState()
-    var appLockEnabled by remember { mutableStateOf(false) } // In reality this would be persisted in SharedPreferences or DataStore
+    var appLockEnabled by remember { mutableStateOf(viewModel.prefs.isAppLockEnabled) }
 
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val granted = permissions.entries.all { it.value }
@@ -82,6 +82,7 @@ fun SettingsScreen(viewModel: KnzViewModel) {
                             when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
                                 BiometricManager.BIOMETRIC_SUCCESS -> {
                                     appLockEnabled = checked
+                                    viewModel.prefs.isAppLockEnabled = checked
                                     Toast.makeText(context, if (checked) "App Lock Enabled" else "App Lock Disabled", Toast.LENGTH_SHORT).show()
                                 }
                                 else -> {

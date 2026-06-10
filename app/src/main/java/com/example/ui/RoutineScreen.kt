@@ -49,7 +49,7 @@ fun RoutineScreen(viewModel: KnzViewModel) {
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp).fillMaxSize()) {
             
-            ChallengeSection()
+            ChallengeSection(viewModel = viewModel)
             
             Spacer(modifier = Modifier.height(24.dp))
             
@@ -177,11 +177,13 @@ fun RoutineScreen(viewModel: KnzViewModel) {
 }
 
 @Composable
-fun ChallengeSection() {
-    var isRunning by remember { mutableStateOf(false) }
-    var progressDays by remember { mutableStateOf(1) } // Assume out of 30 days
+fun ChallengeSection(viewModel: KnzViewModel) {
+    var isRunning by remember { mutableStateOf(viewModel.prefs.isChallengeRunning) }
+    var progressDays by remember { mutableStateOf(1) }
     val maxDays = 30
     var currentMotivationQuote by remember { mutableStateOf("Start your journey today.") }
+    var showStopDialog by remember { mutableStateOf(false) }
+    
     val quotes = listOf(
         "Believe in yourself.",
         "Every day is a new beginning.",
@@ -194,11 +196,52 @@ fun ChallengeSection() {
     
     LaunchedEffect(isRunning) {
         if (isRunning) {
+            currentMotivationQuote = quotes.random()
+            val startTime = viewModel.prefs.challengeStartTimeMs
+            if (startTime <= 0) {
+                viewModel.prefs.challengeStartTimeMs = System.currentTimeMillis()
+                progressDays = 1
+            } else {
+                val diffMs = System.currentTimeMillis() - startTime
+                val daysPassed = (diffMs / (1000 * 60 * 60 * 24)).toInt()
+                progressDays = (daysPassed + 1).coerceAtMost(maxDays)
+            }
             while(true) {
                 delay(30000)
                 currentMotivationQuote = quotes.random()
+                // Recalculate progress occasionally too
+                val reDiffMs = System.currentTimeMillis() - viewModel.prefs.challengeStartTimeMs
+                val reDaysPassed = (reDiffMs / (1000 * 60 * 60 * 24)).toInt()
+                progressDays = (reDaysPassed + 1).coerceAtMost(maxDays)
             }
+        } else {
+            currentMotivationQuote = "Start your journey today."
+            progressDays = 0
+            viewModel.prefs.challengeStartTimeMs = -1
         }
+    }
+
+    if (showStopDialog) {
+        AlertDialog(
+            onDismissRequest = { showStopDialog = false },
+            title = { Text("Stop Challenge?") },
+            text = { Text("Are you sure you want to stop? Your 30-day progress will be lost.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isRunning = false
+                        viewModel.prefs.isChallengeRunning = false
+                        showStopDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Stop Challenge")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showStopDialog = false }) { Text("Cancel") }
+            }
+        )
     }
 
     val animatedProgress by animateFloatAsState(targetValue = progressDays.toFloat() / maxDays.toFloat(), label = "progress")
@@ -248,13 +291,18 @@ fun ChallengeSection() {
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Button(onClick = { isRunning = !isRunning; if (!isRunning) currentMotivationQuote = "Challenge Paused." }, colors = ButtonDefaults.buttonColors(containerColor = if (isRunning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)) {
+                Button(
+                    onClick = { 
+                        if (isRunning) {
+                            showStopDialog = true 
+                        } else {
+                            isRunning = true
+                            viewModel.prefs.isChallengeRunning = true
+                        }
+                    }, 
+                    colors = ButtonDefaults.buttonColors(containerColor = if (isRunning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
+                ) {
                     Text(if (isRunning) "Stop Challenge" else "Start Challenge")
-                }
-                if (isRunning) {
-                    OutlinedButton(onClick = { if (progressDays < maxDays) progressDays++ }) {
-                        Text("+1 Day")
-                    }
                 }
             }
 
