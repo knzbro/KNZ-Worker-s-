@@ -21,7 +21,7 @@ import com.example.data.Lead
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeadPipelineScreen(viewModel: KnzViewModel) {
+fun LeadPipelineScreen(viewModel: KnzViewModel, onLeadClick: (Lead) -> Unit) {
     val leads by viewModel.filteredLeads.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val statusFilter by viewModel.statusFilter.collectAsState()
@@ -69,7 +69,7 @@ fun LeadPipelineScreen(viewModel: KnzViewModel) {
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(leads) { lead ->
-                        LeadCard(lead = lead, viewModel = viewModel)
+                        LeadCard(lead = lead, onClick = { onLeadClick(lead) })
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -87,55 +87,26 @@ fun LeadPipelineScreen(viewModel: KnzViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeadCard(lead: Lead, viewModel: KnzViewModel) {
-    val context = LocalContext.current
-    val statuses = listOf("Scouted", "Waiting", "Hired", "Rejected")
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+fun LeadCard(lead: Lead, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        onClick = onClick
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(lead.businessName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                IconButton(onClick = { viewModel.deleteLead(lead) }) {
-                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                Badge(containerColor = when(lead.status) {
+                    "Scouted" -> MaterialTheme.colorScheme.secondary
+                    "Waiting" -> MaterialTheme.colorScheme.error
+                    "Hired" -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.outline
+                }) {
+                    Text(lead.status, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
                 }
             }
+            Spacer(modifier = Modifier.height(4.dp))
             Text("📍 ${lead.location}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("📞 ${lead.whatsappNumber}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse("https://wa.me/${lead.whatsappNumber.replace(Regex("[^0-9]"), "")}")
-                context.startActivity(intent)
-            }.padding(vertical = 4.dp))
-            Text("📝 ${lead.description}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
-                OutlinedTextField(
-                    value = lead.status,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Status") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    statuses.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption) },
-                            onClick = {
-                                viewModel.updateLeadStatus(lead, selectionOption)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
         }
     }
 }

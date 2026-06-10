@@ -43,19 +43,20 @@ class MainActivity : ComponentActivity() {
 }
 
 sealed class Screen(val route: String, val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    object Home : Screen("home", "Home", Icons.Filled.Home)
     object Leads : Screen("leads", "Leads", Icons.Filled.Group)
+    object Browser : Screen("browser", "Browser", Icons.Filled.Language)
     object Calculator : Screen("calculator", "Profit", Icons.Filled.AttachMoney)
-    object Audit : Screen("audit", "Audit", Icons.Filled.Checklist)
-    object Assets : Screen("assets", "Extract", Icons.Filled.FolderZip)
-    object Routines : Screen("routines", "Routines", Icons.Filled.Schedule)
+    object Menu : Screen("menu", "Menu", Icons.Filled.Menu)
+    object LeadDetail : Screen("lead_detail", "Lead Detail", Icons.Filled.Info)
 }
 
 val items = listOf(
+    Screen.Home,
     Screen.Leads,
+    Screen.Browser,
     Screen.Calculator,
-    Screen.Audit,
-    Screen.Assets,
-    Screen.Routines
+    Screen.Menu
 )
 
 @Composable
@@ -88,14 +89,22 @@ fun MainApp(viewModel: KnzViewModel) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Leads.route,
+            startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Leads.route) { LeadPipelineScreen(viewModel = viewModel) }
+            composable(Screen.Home.route) { HomeScreen(viewModel = viewModel) }
+            composable(Screen.Leads.route) { 
+                LeadPipelineScreen(viewModel = viewModel, onLeadClick = { lead ->
+                    viewModel.selectedLead.value = lead
+                    navController.navigate(Screen.LeadDetail.route)
+                }) 
+            }
+            composable(Screen.Browser.route) { MiniBrowserScreen() }
             composable(Screen.Calculator.route) { ProfitGuardScreen() }
-            composable(Screen.Audit.route) { AuditChecklistScreen() }
-            composable(Screen.Assets.route) { AssetSystemScreen(viewModel = viewModel) }
-            composable(Screen.Routines.route) { RoutineScreen(viewModel = viewModel) }
+            composable(Screen.Menu.route) { MenuScreen(viewModel = viewModel) }
+            composable(Screen.LeadDetail.route) {
+                LeadDetailScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
+            }
         }
     }
 }

@@ -45,6 +45,8 @@ class KnzViewModel(private val repository: KnzRepository, private val context: C
         initialValue = emptyList()
     )
 
+    val selectedLead = MutableStateFlow<Lead?>(null)
+
     val activeTimers = MutableStateFlow<Map<Int, Long>>(emptyMap())
     private val timerJobs = mutableMapOf<Int, Job>()
     private var mediaPlayer: MediaPlayer? = null
