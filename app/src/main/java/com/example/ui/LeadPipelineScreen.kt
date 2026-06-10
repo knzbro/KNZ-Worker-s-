@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -18,9 +19,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.Lead
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeadPipelineScreen(viewModel: KnzViewModel) {
-    val leads by viewModel.leads.collectAsState()
+    val leads by viewModel.filteredLeads.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val statusFilter by viewModel.statusFilter.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -39,12 +43,31 @@ fun LeadPipelineScreen(viewModel: KnzViewModel) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { viewModel.searchQuery.value = it },
+                label = { Text("Search Leads") },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            )
+
+            val filterStatuses = listOf("All", "Scouted", "Waiting", "Hired", "Rejected")
+            LazyRow(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                items(filterStatuses) { status ->
+                    FilterChip(
+                        selected = statusFilter == status,
+                        onClick = { viewModel.statusFilter.value = status },
+                        label = { Text(status) },
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+            }
+
             if (leads.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No Leads Available.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("No Leads Match.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
-                LazyColumn {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(leads) { lead ->
                         LeadCard(lead = lead, viewModel = viewModel)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -96,7 +119,7 @@ fun LeadCard(lead: Lead, viewModel: KnzViewModel) {
                     readOnly = true,
                     label = { Text("Status") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth()
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,

@@ -18,6 +18,8 @@ data class Lead(
 data class Routine(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
-    val audioNode: String, // E.g., "Alert 1", "Bell", "Synth"
+    val category: String = "General", // Work, Free, School, Friends
+    val durationSeconds: Long = 0L,
+    val audioUri: String? = null,
     val timestamp: Long = System.currentTimeMillis()
 )

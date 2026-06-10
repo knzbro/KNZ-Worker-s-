@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val PremiumDarkColorScheme = darkColorScheme(
+val CyberpunkColorScheme = darkColorScheme(
     primary = Color(0xFF00E5FF),
     onPrimary = Color(0xFF000000),
     secondary = Color(0xFFFFAB00),
@@ -29,13 +29,46 @@ private val PremiumDarkColorScheme = darkColorScheme(
     onError = Color(0xFF000000),
 )
 
+val MidnightColorScheme = darkColorScheme(
+    primary = Color(0xFF4C82FF),
+    onPrimary = Color(0xFF000000),
+    secondary = Color(0xFFB388FF),
+    onSecondary = Color(0xFF000000),
+    background = Color(0xFF0B101E),
+    surface = Color(0xFF141926),
+    onBackground = Color(0xFFD4DAE8),
+    onSurface = Color(0xFFD4DAE8),
+    surfaceVariant = Color(0xFF1F2536),
+    onSurfaceVariant = Color(0xFF9098A9),
+    error = Color(0xFFFF5252),
+)
+
+val EmeraldColorScheme = darkColorScheme(
+    primary = Color(0xFF00E676),
+    onPrimary = Color(0xFF000000),
+    secondary = Color(0xFF81C784),
+    onSecondary = Color(0xFF000000),
+    background = Color(0xFF0A120D),
+    surface = Color(0xFF111D15),
+    onBackground = Color(0xFFD2E0D6),
+    onSurface = Color(0xFFD2E0D6),
+    surfaceVariant = Color(0xFF182A1E),
+    onSurfaceVariant = Color(0xFF8B9E91),
+    error = Color(0xFFFF5252),
+)
+
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = true, // Force dark theme as requested
+    darkTheme: Boolean = true,
     dynamicColor: Boolean = false,
+    themeIndex: Int = 0,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = PremiumDarkColorScheme
+    val colorScheme = when (themeIndex) {
+        1 -> MidnightColorScheme
+        2 -> EmeraldColorScheme
+        else -> CyberpunkColorScheme
+    }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -51,3 +84,4 @@ fun MyApplicationTheme(
         content = content
     )
 }
+

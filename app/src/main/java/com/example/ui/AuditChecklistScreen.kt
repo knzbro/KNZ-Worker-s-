@@ -1,5 +1,7 @@
 package com.example.ui
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,7 +21,13 @@ fun AuditChecklistScreen() {
     )
 
     var states by remember { mutableStateOf(List(5) { false }) }
+    val maxScore = 10
     val score = states.count { it } * 2
+    
+    val animatedProgress by animateFloatAsState(
+        targetValue = score / 10f,
+        animationSpec = tween(durationMillis = 800)
+    )
 
     Column(
         modifier = Modifier
@@ -41,10 +49,17 @@ fun AuditChecklistScreen() {
             Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Quality Score", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    text = "$score/10",
+                    text = "$score/$maxScore",
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Black,
                     color = if (score >= 8) MaterialTheme.colorScheme.primary else if (score >= 6) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                LinearProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier.fillMaxWidth().height(16.dp),
+                    color = if (score >= 8) MaterialTheme.colorScheme.primary else if (score >= 6) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
+                    trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                 )
             }
         }

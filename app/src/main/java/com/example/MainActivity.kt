@@ -31,10 +31,11 @@ class MainActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(applicationContext)
         val repository = KnzRepository(database.knzDao())
-        val viewModel: KnzViewModel by viewModels { KnzViewModelFactory(repository) }
+        val viewModel: KnzViewModel by viewModels { KnzViewModelFactory(repository, applicationContext) }
 
         setContent {
-            MyApplicationTheme {
+            val themeIndex by viewModel.themeIndex.collectAsState()
+            MyApplicationTheme(themeIndex = themeIndex) {
                 MainApp(viewModel)
             }
         }
@@ -93,7 +94,7 @@ fun MainApp(viewModel: KnzViewModel) {
             composable(Screen.Leads.route) { LeadPipelineScreen(viewModel = viewModel) }
             composable(Screen.Calculator.route) { ProfitGuardScreen() }
             composable(Screen.Audit.route) { AuditChecklistScreen() }
-            composable(Screen.Assets.route) { AssetSystemScreen() }
+            composable(Screen.Assets.route) { AssetSystemScreen(viewModel = viewModel) }
             composable(Screen.Routines.route) { RoutineScreen(viewModel = viewModel) }
         }
     }
