@@ -106,11 +106,12 @@ class TimerService : Service() {
     private fun playRingtone(uriString: String?) {
         try {
             mediaPlayer?.release()
-            mediaPlayer = if (uriString != null) {
-                MediaPlayer.create(this, Uri.parse(uriString))
+            val uri = if (uriString != null) {
+                Uri.parse(uriString)
             } else {
-                null
+                android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
             }
+            mediaPlayer = MediaPlayer.create(this, uri)
             mediaPlayer?.start()
         } catch (e: Exception) {
             e.printStackTrace()

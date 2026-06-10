@@ -123,12 +123,7 @@ fun RoutineScreen(viewModel: KnzViewModel) {
             var minutesInput by remember { mutableStateOf("25") }
             var secondsInput by remember { mutableStateOf("0") }
             var selectedDate by remember { mutableStateOf("Today") }
-            var audioUri by remember { mutableStateOf<Uri?>(null) }
             
-            val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-                audioUri = uri
-            }
-
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 title = { Text("New Custom Timer") },
@@ -150,11 +145,7 @@ fun RoutineScreen(viewModel: KnzViewModel) {
                         OutlinedTextField(value = selectedDate, onValueChange = { selectedDate = it }, label = { Text("Target Date (Optional)") }, modifier = Modifier.fillMaxWidth())
 
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { launcher.launch("audio/*") }, modifier = Modifier.fillMaxWidth()) {
-                            Icon(Icons.Default.Audiotrack, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(if (audioUri == null) "Select Custom Ringtone" else "Ringtone Selected")
-                        }
+                        Text("Default alarm sound will play when timer finishes.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 confirmButton = {
@@ -164,7 +155,7 @@ fun RoutineScreen(viewModel: KnzViewModel) {
                         val s = secondsInput.toLongOrNull() ?: 0L
                         val durationSeconds = (h * 3600L) + (m * 60L) + s
                         
-                        viewModel.addRoutine(name, category, durationSeconds, audioUri?.toString())
+                        viewModel.addRoutine(name, category, durationSeconds, null)
                         showDialog = false
                     }) { Text("Add Timer") }
                 },

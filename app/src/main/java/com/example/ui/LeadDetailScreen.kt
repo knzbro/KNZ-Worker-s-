@@ -4,8 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,7 +35,7 @@ fun LeadDetailScreen(viewModel: KnzViewModel, onBack: () -> Unit) {
             TopAppBar(
                 title = { Text("Business Details") },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "Back") }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
                 },
                 actions = {
                     IconButton(onClick = { 
@@ -97,7 +97,7 @@ fun LeadDetailScreen(viewModel: KnzViewModel, onBack: () -> Unit) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(Icons.Default.Chat, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Chat on WhatsApp")
                     }

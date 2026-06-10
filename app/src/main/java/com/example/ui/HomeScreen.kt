@@ -8,10 +8,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,6 +43,8 @@ fun HomeScreen(viewModel: KnzViewModel) {
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 24.dp)
         )
+
+        var showAddLeadDialog by remember { mutableStateOf(false) }
 
         // Main Dashboard Grid
         Row(
@@ -78,7 +79,7 @@ fun HomeScreen(viewModel: KnzViewModel) {
                         Surface(shape = RoundedCornerShape(12.dp), color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)) {
                             Icon(Icons.Default.Business, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(8.dp).size(24.dp))
                         }
-                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
@@ -94,7 +95,8 @@ fun HomeScreen(viewModel: KnzViewModel) {
                 Card(
                     modifier = Modifier.weight(1f).fillMaxWidth(),
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    onClick = { showAddLeadDialog = true }
                 ) {
                     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                         Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondary, modifier = Modifier.align(Alignment.TopEnd))
@@ -115,7 +117,7 @@ fun HomeScreen(viewModel: KnzViewModel) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
                 ) {
                     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                        Icon(Icons.Default.TrendingUp, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.align(Alignment.TopEnd))
+                        Icon(Icons.AutoMirrored.Filled.TrendingUp, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiary, modifier = Modifier.align(Alignment.TopEnd))
                         
                         var progressDays by remember { mutableStateOf(0) }
                         LaunchedEffect(Unit) {
@@ -149,7 +151,7 @@ fun HomeScreen(viewModel: KnzViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
         
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
@@ -178,6 +180,37 @@ fun HomeScreen(viewModel: KnzViewModel) {
                     }
                 }
             }
+        }
+
+        if (showAddLeadDialog) {
+            var businessName by remember { mutableStateOf("") }
+            var location by remember { mutableStateOf("") }
+            var whatsapp by remember { mutableStateOf("") }
+            var description by remember { mutableStateOf("") }
+
+            AlertDialog(
+                onDismissRequest = { showAddLeadDialog = false },
+                title = { Text("New Account", fontWeight = FontWeight.Bold) },
+                text = {
+                    Column {
+                        OutlinedTextField(value = businessName, onValueChange = { businessName = it }, label = { Text("Business Name") }, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp))
+                        OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Location") }, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp))
+                        OutlinedTextField(value = whatsapp, onValueChange = { whatsapp = it }, label = { Text("WhatsApp Number") }, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), shape = RoundedCornerShape(12.dp))
+                        OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth().height(100.dp), shape = RoundedCornerShape(12.dp), maxLines = 4)
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        viewModel.addLead(businessName, location, whatsapp, description)
+                        showAddLeadDialog = false
+                    }, shape = RoundedCornerShape(12.dp)) {
+                        Text("Add Business")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showAddLeadDialog = false }) { Text("Cancel") }
+                }
+            )
         }
     }
 }

@@ -82,8 +82,13 @@ class MainActivity : FragmentActivity() {
             }
 
             MyApplicationTheme(themeIndex = themeIndex) {
+                var showWelcomeScreen by remember { mutableStateOf(true) }
                 if (isUnlocked) {
-                    MainApp(viewModel)
+                    if (showWelcomeScreen) {
+                        WelcomeScreen(onStartClicked = { showWelcomeScreen = false })
+                    } else {
+                        MainApp(viewModel)
+                    }
                 } else {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
