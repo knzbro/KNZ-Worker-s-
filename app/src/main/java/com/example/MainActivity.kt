@@ -75,9 +75,22 @@ class MainActivity : FragmentActivity() {
                     }
                 })
 
-            LaunchedEffect(Unit) {
-                if (prefs.isAppLockEnabled) {
-                    biometricPrompt.authenticate(promptInfo)
+            val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+            DisposableEffect(lifecycleOwner) {
+                val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                    if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                        if (prefs.isAppLockEnabled && !isUnlocked) {
+                            try {
+                                biometricPrompt.authenticate(promptInfo)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    }
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose {
+                    lifecycleOwner.lifecycle.removeObserver(observer)
                 }
             }
 

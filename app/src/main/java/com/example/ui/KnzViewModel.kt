@@ -161,10 +161,14 @@ class KnzViewModel(private val repository: KnzRepository, private val context: C
             putExtra(com.example.service.TimerService.EXTRA_AUDIO_URI, routine.audioUri)
         }
         
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         val job = viewModelScope.launch {
@@ -191,7 +195,11 @@ class KnzViewModel(private val repository: KnzRepository, private val context: C
                 action = com.example.service.TimerService.ACTION_STOP_TIMER
                 putExtra(com.example.service.TimerService.EXTRA_ROUTINE_ID, routineId)
             }
-            context.startService(intent)
+            try {
+                context.startService(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

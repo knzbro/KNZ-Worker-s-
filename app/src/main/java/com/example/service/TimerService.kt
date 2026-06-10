@@ -46,6 +46,12 @@ class TimerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        try {
+            startForeground(1, buildNotification("Timer Service Active", "Managing Your Timers"))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
         intent?.let {
             when (it.action) {
                 ACTION_START_TIMER -> {
@@ -58,7 +64,7 @@ class TimerService : Service() {
                         startTimer(id, name, duration, audioUri)
                     }
                     
-                    startForeground(1, buildNotification("Active Timers: ${activeTimers.size}"))
+                    updateNotification()
                 }
                 ACTION_STOP_TIMER -> {
                     val id = it.getIntExtra(EXTRA_ROUTINE_ID, -1)
