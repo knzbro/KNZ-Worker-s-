@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
@@ -57,6 +58,22 @@ val EmeraldColorScheme = darkColorScheme(
     error = Color(0xFFFF5252),
 )
 
+val FreshLightColorScheme = lightColorScheme(
+    primary = Color(0xFF12C99B),
+    onPrimary = Color.White,
+    secondary = Color(0xFF2196F3),
+    onSecondary = Color.White,
+    tertiary = Color(0xFFFF7043),
+    onTertiary = Color.White,
+    background = Color(0xFFF9F9F9),
+    surface = Color(0xFFFFFFFF),
+    onBackground = Color(0xFF111111),
+    onSurface = Color(0xFF111111),
+    surfaceVariant = Color(0xFFEEEEEE),
+    onSurfaceVariant = Color(0xFF444444),
+    error = Color(0xFFFF5252),
+)
+
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = true,
@@ -67,6 +84,7 @@ fun MyApplicationTheme(
     val colorScheme = when (themeIndex) {
         1 -> MidnightColorScheme
         2 -> EmeraldColorScheme
+        3 -> FreshLightColorScheme
         else -> CyberpunkColorScheme
     }
     val view = LocalView.current

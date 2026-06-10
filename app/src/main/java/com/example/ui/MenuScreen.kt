@@ -34,7 +34,7 @@ fun MenuScreen(viewModel: KnzViewModel) {
         Box(modifier = Modifier.fillMaxSize().weight(1f)) {
             when (selectedTabIndex) {
                 0 -> RoutineScreen(viewModel = viewModel)
-                1 -> AssetSystemScreen(viewModel = viewModel)
+                1 -> SettingsScreen(viewModel = viewModel)
             }
         }
     }

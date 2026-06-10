@@ -1,7 +1,7 @@
 package com.example
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -23,7 +23,7 @@ import com.example.data.KnzRepository
 import com.example.ui.*
 import com.example.ui.theme.MyApplicationTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +45,7 @@ class MainActivity : ComponentActivity() {
 sealed class Screen(val route: String, val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
     object Home : Screen("home", "Home", Icons.Filled.Home)
     object Leads : Screen("leads", "Leads", Icons.Filled.Group)
-    object Browser : Screen("browser", "Browser", Icons.Filled.Language)
-    object Calculator : Screen("calculator", "Profit", Icons.Filled.AttachMoney)
+    object Challenge : Screen("challenge", "Challenge", Icons.Filled.Timer)
     object Menu : Screen("menu", "Menu", Icons.Filled.Menu)
     object LeadDetail : Screen("lead_detail", "Lead Detail", Icons.Filled.Info)
 }
@@ -54,8 +53,7 @@ sealed class Screen(val route: String, val title: String, val icon: androidx.com
 val items = listOf(
     Screen.Home,
     Screen.Leads,
-    Screen.Browser,
-    Screen.Calculator,
+    Screen.Challenge,
     Screen.Menu
 )
 
@@ -99,8 +97,7 @@ fun MainApp(viewModel: KnzViewModel) {
                     navController.navigate(Screen.LeadDetail.route)
                 }) 
             }
-            composable(Screen.Browser.route) { MiniBrowserScreen() }
-            composable(Screen.Calculator.route) { ProfitGuardScreen() }
+            composable(Screen.Challenge.route) { RoutineScreen(viewModel = viewModel) }
             composable(Screen.Menu.route) { MenuScreen(viewModel = viewModel) }
             composable(Screen.LeadDetail.route) {
                 LeadDetailScreen(viewModel = viewModel, onBack = { navController.popBackStack() })

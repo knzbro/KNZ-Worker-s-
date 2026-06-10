@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class KnzViewModel(private val repository: KnzRepository, private val context: Context) : ViewModel() {
 
-    val themeIndex = MutableStateFlow(0)
+    val themeIndex = MutableStateFlow(3)
     fun setThemeIndex(index: Int) { themeIndex.value = index }
 
     val leads: StateFlow<List<Lead>> = repository.allLeads.stateIn(
